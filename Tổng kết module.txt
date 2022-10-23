@@ -1,0 +1,16 @@
+Information Theory
+Truyền tin thực chất là truyền mã code (0101) từ source tới destination. Khi đó ta cần xử lý các vấn đề như đường truyền và source phải đồng bộ nhau về capacity.
+Dùng các thuật toán channel encoding phù hợp để tối ưu, reduce noise, more reliable. Đó là basic của compression
+
+
+
+# Basic
+Information entroy: là số bit cần thiết để mã hóa 1 lương thông tin
+
+Data, signal và information khác nhau: Ta nhận về data và extract ra information, tức information là 1 từ trừu tượng k thể cho nhận. Data chỉ xuất hiện 1 lần, kể từ lần sau sẽ được gọi là signal.
+
+Hiện tại, k ai dùng analog signal vì nó khó hơn và đồ thi là continuous hình sóng khó biểu diễn. Bh người ta dùng digital signal vì nó biểu diễn decrete number thấp hay cao theo từng mốc 0-1, dễ biểu diễn, dễ hiểu, đồ thị là từng cục hcn liên tiếp nhau.
+
+
+
+
