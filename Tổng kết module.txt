@@ -5,12 +5,237 @@ Dùng các thuật toán channel encoding phù hợp để tối ưu, reduce noi
 
 
 # Basic
-Information entroy: là số bit cần thiết để mã hóa 1 lương thông tin
+-> Information entroy: là số bit cần thiết để mã hóa 1 lương thông tin => đó là 1 cách hiểu. Thực tế information entropy là expected average amount of information trong message mà nguồn sinh ra. Nó là amount of message or hiểu là lượng bit cần để mã hóa cái message hoàn toàn.
 
-Data, signal và information khác nhau: Ta nhận về data và extract ra information, tức information là 1 từ trừu tượng k thể cho nhận. Data chỉ xuất hiện 1 lần, kể từ lần sau sẽ được gọi là signal.
+Communication system là sự trao đổi thông tin giữa m1 và m2 nhưng chỉ khi m1 và m2 là 2 đối tượng cùng loại
+
+Data, signal và information khác nhau: Ta nhận về data và extract ra information, tức information là 1 từ trừu tượng k thể cho nhận, khi biết về nó sẽ khiến cho sự mơ hồ của nó giảm đi. Còn signal là sự biến đổi của data để phù hợp vưới môi trường lan truyền. VD audio, video là data thì signal là việc transform nó thành sóng điện tử để truyền đi. 
+VD: khi ta nói, ý nghĩ của ta mới là information trừu tượng, data là sự rung của thanh quản, signal là âm thanh ta nghe thấy.
 
 Hiện tại, k ai dùng analog signal vì nó khó hơn và đồ thi là continuous hình sóng khó biểu diễn. Bh người ta dùng digital signal vì nó biểu diễn decrete number thấp hay cao theo từng mốc 0-1, dễ biểu diễn, dễ hiểu, đồ thị là từng cục hcn liên tiếp nhau.
 
+3 vấn đề của truyền thông tin: xung đột, mã hóa truyền tin, reduce noise và kc xa, tắc nghẽn khi source cung nhiều nhưng tải k đủ
+
+
+
+# Source and channel
+-> Channel coder: giải quyết noise => mã hóa kênh: cho data vào container, chuyển cả container, unload data from container. Nhờ cơ chế đó mà giảm noise thay vì truyền data trực tiếp qua channel.
+
+Channel coder có thể chèn thêm vài bit vào để prevent or detect noise. VD A 00 là code symbol => nó thêm vào thành 00|1 chẳng hạn thì thêm 1 bit vào cuối sẽ biến nó thành code word. Nó chuyển từ code symbol -> code word. Code word được gửi cho digital channel(thành 1 loai signal khác) và đến nơi thì demodulator lại chuyển nó thành code word -> đi qua channel coder điểm đích về lại thành code symbol.
+
+Source coder: bộ nén nguồn. Lo nhiệm vụ nén và convert data ra code symbol 01001010
+
+-> Pb 2 pp:
+Parity: có sai nhưng kb ở đâu, k fix được
+ERC: mã giúp sửa sai, biết được lỗi sai ở đâu
+
+-> Biểu diễn nguồn
+P(Y|X) = xác suất nguồn output cho ra là Y khi input nhận vào là X
+
+Nguồn k thể mô tả thuộc tính mà phải dựa vào các bản tin mà chính nguồn đó phát ra. Dựa vào nó để đoán ra thuộc tính của nguồn. 
+Ký hiệu nguồn là số bản ghi khác nhau sinh ra.
+VD: biểu diễn nguồn biết nguồn có 1 symbol là "Information theory" => phải tách chữ hoa thg, dấu cách trong thực tế
+X={INFORMATHEY}
+P(i) = ...
+P(n) = ...
+=> biểu diễn (ký tự, P(ký tự)). VD: P(m) = (x = "m", 1/7)
+
+-> Nguồn k nhớ: đặc tính của nguồn xđ qua xs k điều kiện, xs ký hiệu nguồn sinh ra.
+Nguồn có nhớ: giá trị sinh ra tại thời điểm t phụ thuộc vào giá trị sinh ra tại thời điểm t - 1 thì phải dùng xs có điều kiện kiểu cái trước sinh ra gì thì xs để cái này sinh ra gì
+
+VD: để xđ đặc trưng của nguồn cần xđ 2 yếu tố, các ký hiệu khác nhau và xs của từng ký hiệu
+S = {0,1,2,3}
+P(S) = {1/4, 1/4, 1/4, 1/4}
+
+-> Transition probabilities: kể cả truyền 0 ra 1 hay truyền 1 ra 0, miễn là ta chắc chắn đầu ra là gì thì đều có thể nói nguồn đó là ideal case
+
+
+
+# Information measure
+-> Cần có 1 đơn vị để đo lượng thông tin, nó phải có các tính chất:
+2 lần đo 2 entity độc lập phải có kết quả = kết quả đo sum of cả 2 cái 1 lúc
+Số lượng càng lớn, độ đo càng lớn
+Xác suất thông tin xuất hiện càng lớn thì độ mơ hồ càng giảm tức lượng thông tin nhận được càng ít đi
+Tính chất tuyến tính: f(a+b) = f(a) + f(b)
+
+-> Họ đặt 1 chỉ số xs xuất hiện là p(x) thì chỉ số uncertainty phải tỉ lệ nghịch với nó là f(1/p(x)). Chứng minh slide 3 chapter 3 thì để thỏa mãn linearity: hàm số f of uncertainty phải là logarit fucntion
+=> log(1/p(x)) là chỉ số đo uncertainty. Tức lượng tin cung bởi nguồn bằng loga của 1/xác suất xh của ký hiệu tạo ra bởi nguon đó
+
+Dùng cơ số nào của loga đều được, mỗi cơ số thì đơn vị sẽ khác nhau. Thg là 2 thì đơn vị là bit. 
+
+Chỉ số surprise đo thông tin, cụ thể VD 0=0 thì xs luôn xảy ra nên suprise = 0 => vì k nhận thêm thông tin gì cả
+
+-> Probability random process: giả định
+--> Ngẫu nhiên dừng(stationary random process): coi các thứ xs ngẫu nhiên có xs cố định, chứ k bị thay đổi theo thời gian. VD: hôm nay xs là 1/4, mai xs nó là 3/4 thì những tính toán của ta coi như sai. Cho nên ta phải coi nó là 1 qtr dừng để tính toán
+--> Ergodic random process: mỗi lần lấy giá trị thì nó là đặc trưng của cả nguồn luôn, ergodic ý chỉ toàn bộ nguồn đều có ergodic chứ k chỉ xs của 1 ký hiệu
+
+-> Entropy: Độ bất định
+Nếu có nhiều lương tin thì độ bất định giảm xuống vì entropy đo lượng thông tin ~ độ mơ hồ mà. Entropy H(X) = sigma xs lượng tin(là hàm loga) * giá tri trung bình của nó(là xs nó xh) = -Sigma(p(x)*log(p(x))) 
+Tỉ lệ nghịch vì hàm loga 1/p(x) nên thành -log(p(x))
+=> Chú ý ban đầu ta ký hiệu I(xk) là amount of information của từng ký hiệu xk. Thực tế ta ít khi tính nó vì nó k có giá trị gì mà ta thường lấy giá trị trung bình của nó chính là entropy(công thức suy ra từ công thức I(xk))
+
+0<= H(X) <= H(X)max với H(X)max = log|X| với |X| là cardinality của tập X xảy ra khi X phân bố đều tức là xs các ký hiệu nguồn sinh ra là như nhau.
+
+Bản chất: nguồn sinh ra bản tin 5 ký hiệu, thì ta k biêt được xs từng ký hiệu là bnh, nên ta chỉ lấy giá trị trung bình => để tính độ bất định của nguồn => từ đó ss các nguồn. Entropy càng lớn càng tốt.
+VD: P(S) = {1/4, 1/4, 1/4, 1/4} => thực tế có thể ta k biết rõ từng ký hiệu nào có xs bằng bnh như v vì k biết nội dung bên trong.
+=> H(X)max xảy ra ở đây vì xs mọi ký hiệu đều bằng nhau.
+
+Lượng tin trung bình ứng vói 1 ký hiệu nguồn: Ký hiệu là I(xk) vói xk là ký hiệu => đơn vị là bit(nat,..)/symbol => entropy là tổng của cái này*xs xh của mọi symbol là lượng tin trung bình xét cả nguồn
+
+-> Bản chất hơn:
+Cùng 1 bản tin, 1 ký hiệu có mang nhiều thông tin hơn thì số lượng ký hiệu cần truyền là ít hơn.
+
+VD: Nguồn có 4 ký hiệu nguồn abcd có entropy tốt hơn nguồn có 2 ký hiệu ab
+=> Nguồn sinh ra nhiều ký hiệu or ký hiệu có nhiều thông tin hơn thì tốt hơn. 
+Giá trị nguồn lớn nhất VD khi {0.5,0.5} thì tốt nhất, entropy cực đại. Tức là nó khó đoán giá trị vì kb giá trị sau có thể 0 or 1, khi đó thì symbol mà nguồn sinh ra có sự mơ hồ cao nên giá trị cao. Cần chuyển giá trị lệch về giá trị bằng nhau như này để nguồn có entropy max
+
+-> Entropy đồng thời (Joint entropy): là kiểu
+_________________________________
+ X  ------------------\ Output 
+ Y  ------------------/   Z
+_________________________________
+-> Entropy có điều kiện và đơn vị cũng là bit/symbol thôi
+VD: slide
+=> Chỉ cần nhớ 4 công thức: entropy bình thường của 1 random var - 1 nguồn - 1 function, joint entropy, conditional entropy, công thức quan hệ giữa 3 công thức này. VD để tính joint entropy, ta có thể tính trực tiếp, hoặc tính qua conditional entropy và entropy bth.
+
+-> Mutual information(lượng tin tương hỗ) (bit/symbol): 
+Công thức thuần của nó là quan hệ giữa joint probability density pxy(x,y) and product of marginals px(x) py(y)
+______________
+I(X) ---> I(y)
+______________
+=> Cho dù nhận Y nhưng vẫn còn 1 lượng tin X ta chưa biết. Tức I(X|Y) là lượng tin X bị mất mát trên kênh given Y, ngược với I(X;Y) là lượng tin truyền được thành công trên kênh 
+Xét TH X--->Y như trên thì theo sơ đồ Ven trong slide. H(X|Y) là độ bất định lượng X mất mát trên kênh k được gửi tới đích. H(Y|X) là lượng Y nhận được given X nhưng k chuẩn hay lượng tin bị nhiễu.
+H(X,Y) là lượng cả 2 đồng thời = lượng tin mất mát + lượng tin thành công + lượng tin nhiễu nhận được
+=> Dựa vào sơ đồ Ven cho ra công thức
+
+-> Tránh nhầm
+--> m1=AAAABBB... có 1000 symbol; m2=ABCDE... có 10 symbol => 1 symbol có thể có 5 bit, 1 symbol có thể có 8 bit tùy vào nguồn sinh ra nó. 1 message có thể carry nhiều symbol và đơn vị bit per symbol của nó quyết định 1 symbol có thể chứa bnh bit
+Source > message > symbol > bit
+--> VD: nguồn S2 = 1 bit/symbol (or 1 bit/information) thì khi S2 generate a symbol, symbol đó trung bình sẽ carry 1 bit
+--> VD nguồn S1 có ký hiệu A là 90% và B 10% thì trung bình lượng tin ký hiệu A chứa là I(xk) có xác suất xuất hiện là 90% => gọi là độ bất định của 1 ký hiệu. Còn H(X) là entropy của cả nguồn X là trung bình mọi ký hiệu sẽ khác.
+P(x) càng lớn tức xs 1 ký hiệu x xuất hiện càng lớn thì I(xk) càng nhỏ tức lượng tin nó chứa nhỏ dần.
+Entropy ~ độ mơ hồ uncertainty ~ average amount of information
+Entropy luôn dương.
+
+Cần pb công thức I(xk) là average amount of info of 1 ký hiệu xk sinh ra bởi nguồn
+H(X) là average amount of information of mọi ký hiệu sinh ra bởi nguồn
+
+
+
+# Clear phần entropy và mutual
+H(X)=-Sigma(p(X)log(p(X))) (bits/symbol) => Lượng tin trung bình của 1 ký hiệu nằm trong message sinh ra bởi nguồn X => cần pb nguồn và ký hiệu
+
+I(X;Y)=H(X)-H(X|Y) -> đơn vị là bits thôi
+Lượng tin nhận được = Lượng tin đầu vào - Lượng tin khi nhận Y nhưng còn 1 lượng X ko nhận được(lượng tin bị phá hủy bởi nhiễu)
+I(X;Y)=H(X)+H(Y)-H(X,Y)
+=> Thì H(X,Y) là lượng tin nếu cả X và Y cùng làm đầu vào đồng thời thì nó là = nhiễu mất mát + nhiễu sinh ra thêm + truyền thành công = H(X|Y)+H(Y|X)+I(X;Y) = H(X)+H(Y)-I(X;Y) => dùng Ven hiểu hết
+
+VD: 
+0.1 0.1 0.05 0.05
+0.1 0.05 0.05 0.1
+0.025 0.025 0.025 0.025
+0.1 0.05 0.05 0.1
+=> I(X;Y) = 0.0369
+
+-> Lượng tin tương hỗ của A và B là I(A;B) dùng dấu chấm phẩy và là lượng tin trung của A và B
+
+I(X;Y) luôn bằng I(Y;X) => xem công thức là thấy. 
+
+
+
+# Truyền data
+Source (generate data) -> source coder -> (sinh ra output code symbol) -> channel coder -> (biến thành code word và gửi tới channel) -> channel (convert to wave form signal) -> demodulator -> (quay về code word) -> channel decoder -> (symbol) -> source decoder (quay về dạng data ban đầu) -> sink (extract information from data)
+
+-> Source: Để identify a source, ta cần tìm tất cả các symbol khác nhau mà source có thể generate ra và từng probability của từng symbol được sinh ra. Giả định là giá trị probability ta tính ra là chung chứ kp nhất thời như trong thực té
+Discrete source with memory là source cho ra output ở 1 thời điểm sẽ phụ thuộc vào giá trị nó từng generate trước đó.
+m-th order Markov source là phụ thuộc m source trước đó
+
+=> biểu diễn dược state diagram có xác suất 1 source sinh ra giá trị rơi vào symbol nào.
+Initial probability là VD có 3 source đang xét thì 1 trong 3 source đều có thể sinh ra ký tự đầu tiên => tách riêng vói transition probability => phải là 3 state và nó là xs bắt đầu từ state nào mới đúng
+Transition probability: 1 source có xs sinh ra ký tự tiếp theo trên state diagram là bnh. Mỗi khi sinh ra 1 ký tự là nhảy sang state mới trong state diagram nên gọi là transition probablity
+Non ergodic là khi 1 source có prob là 1, tức khi state diagram đi vào source đó thì sẽ luôn luôn là source đó sinh ra 1 ký tự đó kbh đổi.
+Transition matrix là bảng xs của các transition 
+
+-> Source coder: ta cần nó vì cần compress lưu lượng data lớn. Nó dùng 1 tập hợp hữu hạn các symbol để biểu diễn thông tin, chuyển từ data raw sang code symbol
+
+-> Channel coder đầu tiên thêm 1 or 0 ở cuối để check
+
+VD slide: P(2|1) là xác suất nguồn 1 tiếp theo sẽ đi đến nguồn 2 là bnh
+VD: P(10|01) tương đương với P(0|01) tùy loại sách 2 cách viết. Điều này có nghĩa là previous state là 01 -> sinh ra thêm 1 symbol 0 -> biến thành state mới là 010 nhưng state TH này ta chỉ có 4 state tức 2 bit để biểu diễn nên xóa bit cũ đi, 010 xóa 0 thành 10 là state mới 
+
+wi(^t) là xác suất 1 source đạt state i tại thời điểm t => w(^t) là 1 vector => vấn đề phát sinh từ đây mà bắt nguồn là từ cái sơ đồ đi đầu tiên. Ta đang chỉ quan tâm bước đầu của sơ đồ là nguồn sinh symbol ra
+W(^t+1) = PI(W(^t)) nhân ma trận với vector. Ma trận ở đây chính là transition matrix.
+Tức xác suất source ở thời điểm t+1 = Transition matrix * Xác suất source tại thời điểm t
+
+Stationary source là khi w(^t+1) = PI*w(^t)
+Sigma(w(^t)) = 1 => tổng probability mọi ký tự của nguồn tại thời điểm t là 1. VD: w(^t) = [w1(^t) w2(^t) w3(^t)] thì w1(^t) + w2(^t) + w3(^t) = 1
+=> Ta đang cố diễn giải kiểu:
+wi(^t) là xác suất 1 souce đạt state i(sinh ra 1 symbol để nhảy sang state i trên state diagram đó) tại thời điểm t 
+w(^t) là xác suất 1 source sinh ra symbol tại thời điểm t và là 1 vector
+=> Xem trong slide
+
+BT: cho stationary source với 3 state và state diagram. Tìm xác xuất từng state
+Cho transition diagram là tìm được transition matrix vì nó kiểu:
+| P(1|1) P(1|2) --- P(1|N) |
+| P(2|1) P(2|2) --- P(2|N) |
+|    |      |    \      |  |
+| P(N|1) P(N|2) --- P(N|N) |
+=> cái nào trong state diagram k có tức k có xác suất chuyển sang nó nên P = 0
+Tiếp đó dùng công thức: W*PI = W <=>
+| w1 | |                   |   | w1 |
+| w2 |*| Transition matrix | = | w2 |
+| w3 | |                   |   | w3 |
+=> 3 phương trình 3 ẩn là ok
+Còn 1 phương trình nữa là w1+w2+w3 = 1
+
+
+
+# Information source
+Source _____ Nguồn có nhớ: state markov model
+       _____ Nguồn k nhớ: dựa vào 2 thuộc tính (S, P(S)) là symbol và xác suất symbol đó xh. 
+Với nguồn có nhớ có 2 tc qtr: ergodic là là nguồn có 1 state loop vô tận, luôn sinh ra chính nó tiếp theo; stationary là tính chất WX=W
+
+Có I(Si) là amount of information of symbol Si
+Có P(Si) là xác suất symbol đó xuất hiện
+Để tính average information, ta đương nhiên k thể lấy trung bình của các I(Si) được vì có thể 1 symbol có probability hay tần suất xh rất lớn so với các symbol khác nên công thức phải là: Sigma(P(Si)*I(Si)) là công thức trung bình trong xs thống kê
+
+Sang phần markov source có công thức -> entropy of state i / entropy của nguồn go out of state i
+Công thức mới (K liên quan đến information measure ở phần trước): Tính entropy của 1 nguồn H(M)
+H(M) = Sigma(wi*H(Pi)) với wi là xác suất nguồn mang state i và H(Pi) là entropy go out of state i. Cái H(Pi) công thức có mẹ trong slide rồi, chỉ cần có transition matrix là tính được thôi.
+VD: bài tập phần calculate amount of information là 1 source có 3 state, cho transition matrix và tính được hết tất cả entropy go out of từng state, entropy của nguồn, probability của nguồn mang state đó => giải trong tài liệu ảnh
+
+Để tính H(M): tìm transition matrix -> Tính H(Pi) -> Tính wi -> Tính H(M)
+
+Từ 1 state diagram có thể xác định được transition matrix. 1 state diagram hợp lệ khi tổng các đường đi ra của bất cú state nào cũng là 1 nhưng đi vào thì k cần thỏa mãn
+
+-> Redundancy of source: khi entropy nhỏ hơn entropy max thì H(Xmax) - H(X) = độ redundancy
+Entropy của nguồn quá lớn so với khả năng truyền tải của kênh cũng k tốt vì gây mất mát, còn nếu quá nhỏ thì kênh bị dư thừa khi truyền
+
+-> Extension source: ghép thêm 1 nguồn nữa vào input
+VD ghép 2 nguồn thì 1 thời điểm có 2 bit truyền: 00 01 10 11
+Ghép 3 nguồn thì 000 110 111 001 ... => các bit sinh ra từ các nguồn khác nhau độc lập với nhau
+
+VD bt slide: P(00) = 0.04, P(001) = 0.04*0.8=0.032
+H(S^2) = 2H(S) = 2*(-0.2*log(0.2)-0.8*log(0.8)) = 1.44
+CT gốc (coi nó như 1 nguồn sinh 2 ký tự và dùng ct entropy bth) = -0.04log(0.04)-0.64log(0.64)-2*0.16log(0.16) =1.44
+
+-> Information rate: 
+Thông thường họ k dùng H(S) mà dùng R để đo lượng thông tin. R = n0xH(X) 
+Thì n0 là số lượng symbol sinh ra trong 1 đơn vị thời gian. Đa phần trong các TH thì n0 lấy giá trị đơn vị là 1 vì physical parameter. Còn nguồn rời ra thì biểu diễn dưới dạng function.
+
+BT slide: Tìm H(X) dựa vào bảng, còn n0 là số symbol trong 1 đơn vị thời gian là 1s = 9600 symbol/s => 9600*H(X) là ra kết quá
+
+=> Lượng tin trung bình so urce có thể sinh ra trong 1 đơn vị thời gian => thì nhân thêm 1 tham số thôi mà
+
+
+
+# Channel
+I(X;Y)=H(X)-H(X|Y) => info transmit qua channel bằng input info - loss info
+
+VD slide: H(A) = -2/3log(2/3)-1/3*log(1/3)
+H(B) = -(2/3*3/4+1/3*1/8)*log(2/3*3/4+1/3*1/8) -(1/3*7/8+2/3*1/4)*log(1/3*7/8+2/3*1/4)
+H(A|B) = -Sigma(p(A,B)*log(p(A|B))) 
+Với p(A,B) =  p(A|B)*p(B) và p(A|B) trong hình có luôn
 
 
 
